@@ -28,10 +28,16 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
         {
             // Arrange
             var contactId = Guid.NewGuid();
-            var message = new UpdateContactMessage { ContactId = contactId };
+            var message = new UpdateContactMessage { 
+                ContactId = Guid.NewGuid(), 
+                EmailAddress = "contoso@outlook.com",
+                FirstName = "Contoso",
+                LastName = "Kros",
+                PhoneDdd = 11,
+                PhoneNumber = 981888888 };
 
             _consumeContextMock.Setup(c => c.Message).Returns(message);
-            var fakeContact = new Contact { Id = contactId };
+            var fakeContact = _consumer.MapContact(message);
             _contactRepositoryMock.Setup(r => r.GetByIdAsync(contactId))
                 .ReturnsAsync(fakeContact);
 
@@ -43,18 +49,18 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
                 x => x.Log(
                     LogLevel.Information,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Recebida solicitação para deletar o contato com ID: {contactId}")),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Recebida solicitação para atualizar o contato com ID: {contactId}")),
                     null,
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                 Times.Once);
 
-            _contactRepositoryMock.Verify(r => r.DeleteAsync(fakeContact), Times.Once);
+            _contactRepositoryMock.Verify(r => r.UpdateAsync(fakeContact), Times.Once);
 
             _loggerMock.Verify(
                 x => x.Log(
                     LogLevel.Information,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Contato {contactId} removido com sucesso!")),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Contato {contactId} atualizado com sucesso!")),
                     null,
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                 Times.Once);
@@ -65,7 +71,13 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
         {
             // Arrange
             var contactId = Guid.NewGuid();
-            var message = new UpdateContactMessage { ContactId = contactId };
+            var message = new UpdateContactMessage { 
+                ContactId = Guid.NewGuid(), 
+                EmailAddress = "contoso@outlook.com",
+                FirstName = "Contoso",
+                LastName = "Kros",
+                PhoneDdd = 11,
+                PhoneNumber = 981888888 };
 
             _consumeContextMock.Setup(c => c.Message).Returns(message);
             _contactRepositoryMock.Setup(r => r.GetByIdAsync(contactId))
@@ -84,7 +96,7 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                 Times.Once);
 
-            _contactRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Contact>()), Times.Never);
+            _contactRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Contact>()), Times.Never);
         }
 
 
@@ -92,7 +104,13 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
         public async Task Consume_WhenCalled_ShouldLogReceivedMessage()
         {
             // Arrange
-            var message = new RemoveContactMessage { ContactId = Guid.NewGuid() };
+            var message = new UpdateContactMessage { 
+                ContactId = Guid.NewGuid(), 
+                EmailAddress = "contoso@outlook.com",
+                FirstName = "Contoso",
+                LastName = "Kros",
+                PhoneDdd = 11,
+                PhoneNumber = 981888888 };
             _consumeContextMock.Setup(c => c.Message).Returns(message);
 
             // Act
@@ -103,7 +121,7 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
                 x => x.Log(
                     It.Is<LogLevel>(l => l == LogLevel.Information),
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Recebida solicitação para deletar o contato com ID: {message.ContactId}")),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Recebida solicitação para atualizar o contato com ID: {message.ContactId}")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
         }
