@@ -27,10 +27,23 @@ namespace TCFiapConsumerUpdateContact.API
                 return;
             }
 
-            await _contactRepository.UpdateAsync(contact);
+            var contactUpdated = MapContact(message);
 
-            await Task.Delay(500);
+            await _contactRepository.UpdateAsync(contactUpdated);
+
             _logger.LogInformation($"Contato {message.ContactId} atualizado com sucesso!");
         }
+
+        public Contact MapContact(UpdateContactMessage contactUpdated)
+        {
+            return new Contact(){                
+                FirstName = contactUpdated.FirstName,
+                LastName = contactUpdated.LastName,
+                EmailAddress = contactUpdated.EmailAddress,
+                PhoneDdd = contactUpdated.PhoneDdd,
+                PhoneNumber = contactUpdated.PhoneNumber
+            };            
+        }
     }
+
 }
