@@ -1,15 +1,15 @@
 ﻿using MassTransit;
 using TCFiapConsumerUpdateContact.API.Model;
-using DotnetSDK;
+using DotnetSDK.Persistence;
 
 namespace TCFiapConsumerUpdateContact.API
 {
     public class UpdateContactConsumer : IConsumer<UpdateContactMessage>
     {
-        private readonly ILogger<UpdateContactMessage> _logger;
+        private readonly ILogger<UpdateContactConsumer> _logger;
         private readonly IContactRepository _contactRepository;
 
-        public UpdateContactConsumer(ILogger<UpdateContactMessage> logger, IContactRepository contactRepository)
+        public UpdateContactConsumer(ILogger<UpdateContactConsumer> logger, IContactRepository contactRepository)
         {
             _logger = logger;
             _contactRepository = contactRepository;

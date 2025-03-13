@@ -12,7 +12,7 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
         private UpdateContactConsumer _consumer;
         private Mock<ILogger<UpdateContactConsumer>> _loggerMock;
         private Mock<IContactRepository> _contactRepositoryMock;
-        private Mock<ConsumeContext<UpdateContactConsumer>> _consumeContextMock;
+        private Mock<ConsumeContext<UpdateContactMessage>> _consumeContextMock;
 
         [SetUp]
         public void SetUp()
@@ -20,7 +20,7 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
             _loggerMock = new Mock<ILogger<UpdateContactConsumer>>();
             _contactRepositoryMock = new Mock<IContactRepository>();
             _consumer = new UpdateContactConsumer(_loggerMock.Object, _contactRepositoryMock.Object);
-            _consumeContextMock = new Mock<ConsumeContext<UpdateContactConsumer>>();
+            _consumeContextMock = new Mock<ConsumeContext<UpdateContactMessage>>();
         }
 
         [Test]
@@ -28,7 +28,7 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
         {
             // Arrange
             var contactId = Guid.NewGuid();
-            var message = new RemoveContactMessage { ContactId = contactId };
+            var message = new UpdateContactMessage { ContactId = contactId };
 
             _consumeContextMock.Setup(c => c.Message).Returns(message);
             var fakeContact = new Contact { Id = contactId };
@@ -65,7 +65,7 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
         {
             // Arrange
             var contactId = Guid.NewGuid();
-            var message = new RemoveContactMessage { ContactId = contactId };
+            var message = new UpdateContactMessage { ContactId = contactId };
 
             _consumeContextMock.Setup(c => c.Message).Returns(message);
             _contactRepositoryMock.Setup(r => r.GetByIdAsync(contactId))
