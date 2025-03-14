@@ -1,4 +1,4 @@
-﻿namespace TCFiapConsumerUpdateContact.API.Model
+﻿namespace TechChallengeFiap.Messages
 {
     public class UpdateContactMessage
     {

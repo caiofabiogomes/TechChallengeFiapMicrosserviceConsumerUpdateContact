@@ -1,5 +1,6 @@
 using MassTransit;
 using TCFiapConsumerUpdateContact.API;
+using TechChallenge.SDK;
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
@@ -18,7 +19,7 @@ var host = Host.CreateDefaultBuilder(args)
                     h.Password("guest");
                 });
 
-                cfg.ReceiveEndpoint("delete-contact-queue", e =>
+                cfg.ReceiveEndpoint("update-contact-queue", e =>
                 {
                     e.ConfigureConsumer<UpdateContactConsumer>(context);
                 });

@@ -1,6 +1,7 @@
 ﻿using MassTransit;
-using TCFiapConsumerUpdateContact.API.Model;
-using DotnetSDK.Persistence;
+using TechChallenge.SDK.Models;
+using TechChallenge.SDK.Persistence;
+using TechChallengeFiap.Messages;
 
 namespace TCFiapConsumerUpdateContact.API
 {
@@ -21,7 +22,7 @@ namespace TCFiapConsumerUpdateContact.API
             _logger.LogInformation($"Recebida solicitação para atualizar o contato com ID: {message.ContactId}");
 
             var contact = await _contactRepository.GetByIdAsync(message.ContactId);
-            if(contact == null)
+            if (contact == null)
             {
                 _logger.LogWarning($"Contato {message.ContactId} não encontrado!");
                 return;
@@ -36,13 +37,14 @@ namespace TCFiapConsumerUpdateContact.API
 
         public Contact MapContact(UpdateContactMessage contactUpdated)
         {
-            return new Contact(){                
+            return new Contact()
+            {
                 FirstName = contactUpdated.FirstName,
                 LastName = contactUpdated.LastName,
                 EmailAddress = contactUpdated.EmailAddress,
                 PhoneDdd = contactUpdated.PhoneDdd,
                 PhoneNumber = contactUpdated.PhoneNumber
-            };            
+            };
         }
     }
 
