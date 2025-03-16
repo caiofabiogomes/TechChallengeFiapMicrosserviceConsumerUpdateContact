@@ -1,5 +1,6 @@
 using MassTransit;
 using TCFiapConsumerUpdateContact.API;
+using TechChallenge.SDK;
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
