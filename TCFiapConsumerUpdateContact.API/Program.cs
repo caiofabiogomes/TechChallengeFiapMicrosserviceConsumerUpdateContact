@@ -18,10 +18,14 @@ var host = Host.CreateDefaultBuilder(args)
                     h.Password("guest");
                 });
 
-                cfg.ReceiveEndpoint("delete-contact-queue", e =>
+                cfg.ReceiveEndpoint("update-contact-queue", e =>
                 {
                     e.ConfigureConsumer<UpdateContactConsumer>(context);
+
+                    e.SetQueueArgument("x-dead-letter-exchange", "update-contact-dlx-exchange");
+                    e.SetQueueArgument("x-dead-letter-routing-key", "update-contact-dlx");
                 });
+
             });
         });
 
