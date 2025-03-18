@@ -19,28 +19,6 @@ jobs:
       ProjectTest_Name:  TCFiapConsumerUpdateContact.Tests/TCFiapConsumerUpdateContact.Tests.csproj
       IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME }}
 
-
-name: Automated Workflow | Tech Challenge - FIAP
-
-on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
-
-jobs:
-  build:
-    strategy:
-      matrix:
-        configuration: [Debug, Release]
-
-    runs-on: ubuntu-latest
-
-    env:
-      Solution_Name: TechChallengeFiapMicrosserviceConsumerCreateContact.sln
-      ProjectTest_Name:  TcFiapMicrosserviceConsumerCreateContact.Tests/TcFiapMicrosserviceConsumerCreateContact.Tests.csproj
-      IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
