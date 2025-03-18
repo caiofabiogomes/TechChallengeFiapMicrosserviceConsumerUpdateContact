@@ -19,6 +19,28 @@ jobs:
       ProjectTest_Name:  TCFiapConsumerUpdateContact.Tests/TCFiapConsumerUpdateContact.Tests.csproj
       IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME }}
 
+
+name: Automated Workflow | Tech Challenge - FIAP
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+
+    runs-on: ubuntu-latest
+
+    env:
+      Solution_Name: TechChallengeFiapMicrosserviceConsumerCreateContact.sln
+      ProjectTest_Name:  TcFiapMicrosserviceConsumerCreateContact.Tests/TcFiapMicrosserviceConsumerCreateContact.Tests.csproj
+      IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,6 +51,18 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
+          
+      - name: Remove existing NuGet source
+        run: dotnet nuget remove source github || echo "Source not found, skipping removal"
+      
+      - name: Configure NuGet credentials
+        run: |
+          dotnet nuget add source "https://nuget.pkg.github.com/caiofabiogomes/index.json" \
+            --name github \
+            --username caiofabiogomes \
+            --password 1334 \
+            --store-password-in-clear-text
+
 
       - name: Restore and Build
         run: |
@@ -48,7 +82,7 @@ jobs:
       - name: Build and Push Docker Image (Only Release)
         if: matrix.configuration == 'Release'
         run: |
-          docker build -t ${{ env.IMAGE_NAME }}:${{ github.sha }} .
+          docker build --build-arg ARG_SECRET_NUGET_PACKAGES=1334 -t ${{ env.IMAGE_NAME }}:${{ github.sha }} .
           docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.IMAGE_NAME }}:latest
           docker push ${{ env.IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.IMAGE_NAME }}:latest
