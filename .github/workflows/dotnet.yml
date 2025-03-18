@@ -38,7 +38,7 @@ jobs:
           dotnet nuget add source "https://nuget.pkg.github.com/caiofabiogomes/index.json" \
             --name github \
             --username caiofabiogomes \
-            --password 1334 \
+            --password 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 \
             --store-password-in-clear-text
 
 
@@ -60,7 +60,7 @@ jobs:
       - name: Build and Push Docker Image (Only Release)
         if: matrix.configuration == 'Release'
         run: |
-          docker build --build-arg ARG_SECRET_NUGET_PACKAGES=1334 -t ${{ env.IMAGE_NAME }}:${{ github.sha }} .
+          docker build --build-arg ARG_SECRET_NUGET_PACKAGES=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 -t ${{ env.IMAGE_NAME }}:${{ github.sha }} .
           docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.IMAGE_NAME }}:latest
           docker push ${{ env.IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.IMAGE_NAME }}:latest
