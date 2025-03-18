@@ -5,7 +5,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
 using TCFiapConsumerUpdateContact.API;
-using TCFiapConsumerUpdateContact.API.Model;
+using TechChallenge.SDK.Domain.Models;
+using TechChallenge.SDK.Infrastructure.Message;
+using TechChallenge.SDK.Infrastructure.Persistence;
 
 namespace TCFiapConsumerUpdateContact.Tests.IntegrationTests
 {
@@ -29,7 +31,7 @@ namespace TCFiapConsumerUpdateContact.Tests.IntegrationTests
 
                         services.AddMassTransit(x =>
                         {
-                            x.AddConsumer<UpdateContactMessage>();
+                            x.AddConsumer<UpdateContactConsumer>();
                             x.UsingInMemory((context, cfg) =>
                             {
                                 cfg.ConfigureEndpoints(context);
@@ -86,7 +88,7 @@ namespace TCFiapConsumerUpdateContact.Tests.IntegrationTests
 
             var consumerHarness = harness.Consumer(() =>
             {
-                var loggerMock = new Mock<ILogger<UpdateContactMessage>>();
+                var loggerMock = new Mock<ILogger<UpdateContactConsumer>>();
                 var contactRepositoryMock = new Mock<IContactRepository>();
                 var fakeContact = new Contact { Id = fakeContactId };
                 contactRepositoryMock.Setup(r => r.GetByIdAsync(fakeContactId))
@@ -101,7 +103,7 @@ namespace TCFiapConsumerUpdateContact.Tests.IntegrationTests
             try
             {
                 // Act
-                var message = new UpdateContactMessage { ContactId = fakeContactId };
+                var message = new UpdateContactMessage(fakeContactId, "","",11,987654321,"");
                 await harness.InputQueueSendEndpoint.Send(message);
 
                 Assert.IsTrue(await harness.Consumed.Any<UpdateContactMessage>(), "Message was not consumed.");

@@ -1,7 +1,8 @@
 ﻿using MassTransit;
-using TechChallenge.SDK.Models;
-using TechChallenge.SDK.Persistence;
-using TechChallengeFiap.Messages;
+using TechChallenge.SDK.Domain.Models;
+using TechChallenge.SDK.Domain.ValueObjects;
+using TechChallenge.SDK.Infrastructure.Message;
+using TechChallenge.SDK.Infrastructure.Persistence;
 
 namespace TCFiapConsumerUpdateContact.API
 {
@@ -19,32 +20,34 @@ namespace TCFiapConsumerUpdateContact.API
         public async Task Consume(ConsumeContext<UpdateContactMessage> context)
         {
             var message = context.Message;
-            _logger.LogInformation($"Recebida solicitação para atualizar o contato com ID: {message.ContactId}");
+            _logger.LogInformation($"Recebida solicitação para atualizar o contato com ID: {message.Id}");
 
-            var contact = await _contactRepository.GetByIdAsync(message.ContactId);
+            var contact = await _contactRepository.GetByIdAsync(message.Id);
             if (contact == null)
             {
-                _logger.LogWarning($"Contato {message.ContactId} não encontrado!");
+                _logger.LogWarning($"Contato {message.Id} não encontrado!");
                 return;
             }
 
-            var contactUpdated = MapContact(message);
+            var contactUpdated = MapContact(contact, message);
 
             await _contactRepository.UpdateAsync(contactUpdated);
 
-            _logger.LogInformation($"Contato {message.ContactId} atualizado com sucesso!");
+            _logger.LogInformation($"Contato {message.Id} atualizado com sucesso!");
         }
 
-        public Contact MapContact(UpdateContactMessage contactUpdated)
+        public Contact MapContact(Contact contact, UpdateContactMessage message)
         {
-            return new Contact()
-            {
-                FirstName = contactUpdated.FirstName,
-                LastName = contactUpdated.LastName,
-                EmailAddress = contactUpdated.EmailAddress,
-                PhoneDdd = contactUpdated.PhoneDdd,
-                PhoneNumber = contactUpdated.PhoneNumber
-            };
+            var name = new Name(message.FirstName, message.LastName);
+            contact.UpdateName(name);
+
+            var phone = new Phone(message.DDD, message.Phone);
+            contact.UpdatePhone(phone);
+
+            var email = new Email(message.Email);
+            contact.UpdateEmail(email);
+
+            return contact;
         }
     }
 

@@ -2,7 +2,10 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using TCFiapConsumerUpdateContact.API;
-using TCFiapConsumerUpdateContact.API.Model;
+using TechChallenge.SDK.Domain.Models;
+using TechChallenge.SDK.Domain.ValueObjects;
+using TechChallenge.SDK.Infrastructure.Message;
+using TechChallenge.SDK.Infrastructure.Persistence;
 
 namespace TCFiapConsumerUpdateContact.Tests.UnitTests
 {
@@ -25,20 +28,24 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
 
         [Test]
         public async Task Consume_WhenContactExists_ShouldDeleteContactAndLogSuccess()
-        {
-            // Arrange
-            var contactId = Guid.NewGuid();
-            var message = new UpdateContactMessage { 
-                ContactId = Guid.NewGuid(), 
-                EmailAddress = "contoso@outlook.com",
-                FirstName = "Contoso",
-                LastName = "Kros",
-                PhoneDdd = 11,
-                PhoneNumber = 981888888 };
+        { 
+            var contact = new Contact(
+                new Name("Contoso", "Kros"),
+                new Email("contoso@outlook.com"),
+                new Phone(11, 981888888)
+            );
+            var message = new UpdateContactMessage(
+                contact.Id,
+                "Contoso",
+                "Kros",
+                11,
+                981888888,
+                "contoso@outlook.com"                
+                );
 
             _consumeContextMock.Setup(c => c.Message).Returns(message);
-            var fakeContact = _consumer.MapContact(message);
-            _contactRepositoryMock.Setup(r => r.GetByIdAsync(contactId))
+            var fakeContact = _consumer.MapContact(contact,message);
+            _contactRepositoryMock.Setup(r => r.GetByIdAsync(contact.Id))
                 .ReturnsAsync(fakeContact);
 
             // Act
@@ -49,7 +56,7 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
                 x => x.Log(
                     LogLevel.Information,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Recebida solicitação para atualizar o contato com ID: {contactId}")),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Recebida solicitação para atualizar o contato com ID: {contact.Id}")),
                     null,
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                 Times.Once);
@@ -60,7 +67,7 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
                 x => x.Log(
                     LogLevel.Information,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Contato {contactId} atualizado com sucesso!")),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Contato {contact.Id} atualizado com sucesso!")),
                     null,
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                 Times.Once);
@@ -71,13 +78,14 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
         {
             // Arrange
             var contactId = Guid.NewGuid();
-            var message = new UpdateContactMessage { 
-                ContactId = Guid.NewGuid(), 
-                EmailAddress = "contoso@outlook.com",
-                FirstName = "Contoso",
-                LastName = "Kros",
-                PhoneDdd = 11,
-                PhoneNumber = 981888888 };
+            var message = new UpdateContactMessage(
+                Guid.NewGuid(),
+                "Contoso",
+                "Kros",
+                11,
+                981888888,
+                "contoso@outlook.com"
+                );
 
             _consumeContextMock.Setup(c => c.Message).Returns(message);
             _contactRepositoryMock.Setup(r => r.GetByIdAsync(contactId))
@@ -91,7 +99,7 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
                 x => x.Log(
                     LogLevel.Warning,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Contato {contactId} não encontrado!")),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Contato {message.Id} não encontrado!")),
                     null,
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                 Times.Once);
@@ -104,13 +112,15 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
         public async Task Consume_WhenCalled_ShouldLogReceivedMessage()
         {
             // Arrange
-            var message = new UpdateContactMessage { 
-                ContactId = Guid.NewGuid(), 
-                EmailAddress = "contoso@outlook.com",
-                FirstName = "Contoso",
-                LastName = "Kros",
-                PhoneDdd = 11,
-                PhoneNumber = 981888888 };
+            var message = new UpdateContactMessage(
+               Guid.NewGuid(),
+               "Contoso",
+               "Kros",
+               11,
+               981888888,
+               "contoso@outlook.com"
+               );
+
             _consumeContextMock.Setup(c => c.Message).Returns(message);
 
             // Act
@@ -121,7 +131,7 @@ namespace TCFiapConsumerUpdateContact.Tests.UnitTests
                 x => x.Log(
                     It.Is<LogLevel>(l => l == LogLevel.Information),
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Recebida solicitação para atualizar o contato com ID: {message.ContactId}")),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Recebida solicitação para atualizar o contato com ID: {message.Id}")),
                     It.IsAny<Exception>(),
                     It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
         }

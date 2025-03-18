@@ -5,7 +5,12 @@ using TechChallenge.SDK;
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
     {
-        services.RegisterSdkModule(hostContext.Configuration);
+        var connectionString = Environment.GetEnvironmentVariable("CONNECTION_DATABASE") ??
+        hostContext.Configuration.GetConnectionString("DefaultConnection");
+
+        var envHostRabbitMqServer = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
+
+        services.RegisterSdkModule(connectionString);
 
         services.AddMassTransit(x =>
         {
@@ -13,18 +18,11 @@ var host = Host.CreateDefaultBuilder(args)
 
             x.UsingRabbitMq((context, cfg) =>
             {
-                cfg.Host("rabbitmq://localhost", h =>
-                {
-                    h.Username("guest");
-                    h.Password("guest");
-                });
+                cfg.Host(envHostRabbitMqServer); 
 
                 cfg.ReceiveEndpoint("update-contact-queue", e =>
-                {
-                    e.ConfigureConsumer<UpdateContactConsumer>(context);
-
-                    e.SetQueueArgument("x-dead-letter-exchange", "update-contact-dlx-exchange");
-                    e.SetQueueArgument("x-dead-letter-routing-key", "update-contact-dlx");
+                {  
+                    e.ConfigureConsumer<UpdateContactConsumer>(context); 
                 });
 
             });
