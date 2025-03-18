@@ -38,7 +38,7 @@ jobs:
           dotnet nuget add source "https://nuget.pkg.github.com/caiofabiogomes/index.json" \
             --name github \
             --username caiofabiogomes \
-            --password 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 \
+            --password "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" \
             --store-password-in-clear-text
 
 
