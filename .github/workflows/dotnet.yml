@@ -55,7 +55,7 @@ jobs:
       - name: Build and Push Docker Image (Only Release)
         if: matrix.configuration == 'Release'
         run: |
-          docker build --build-arg ARG_SECRET_NUGET_PACKAGES=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 -t ${{ env.IMAGE_NAME }}:${{ github.sha }} .
+          docker build --build-arg ARG_SECRET_NUGET_PACKAGES=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 -t ${{ env.IMAGE_NAME }}:${{ github.sha }} .
           docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.IMAGE_NAME }}:latest
           docker push ${{ env.IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.IMAGE_NAME }}:latest
