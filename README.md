@@ -2,6 +2,8 @@
 
 Este microsserviço .NET consome mensagens para atualização de contatos usando MassTransit e RabbitMQ. Ao receber uma mensagem do tipo `UpdateContactMessage`, ele busca o contato no banco de dados e aplica as atualizações.
 
+Este projeto foi desenvolvido como parte de um trabalho da pós-graduação[repositório(https://github.com/caiofabiogomes/TechChallenge-FIAP-Microsservices)].
+
 ## Tecnologias Utilizadas
 - .NET 8
 - MassTransit
@@ -41,9 +43,12 @@ docker run -d -p 8080:8080 --env CONNECTION_DATABASE="SuaConnectionString" micro
 - `Dockerfile`: Configuração para build e publicação
 
 ## Testes
-- Testes unitários com XUnit 
+- Testes unitários com XUnit
 
 ## Configuração
 - Fila: `update-contact-queue`
 - SDK registrado via `RegisterSdkModule`
+
+## Repositório
+[TechChallengeFiapMicrosserviceConsumerUpdateContact](https://seurepositorio.com/MicrosserviceConsumerUpdateContact.git)
 
