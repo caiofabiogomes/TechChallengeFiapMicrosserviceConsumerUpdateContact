@@ -31,6 +31,14 @@ namespace TCFiapConsumerUpdateContact.API
 
             var contactUpdated = MapContact(contact, message);
 
+            var existingContact = _contactRepository.Query().Where(x => x.Phone.DDD == contactUpdated.Phone.DDD && x.Phone.Number == contactUpdated.Phone.Number).Any();
+
+            if (existingContact)
+            {
+                _logger.LogInformation($"Contato com o numero {contactUpdated.Phone.DDD} {contactUpdated.Phone.Number} já existe!");
+                return;
+            }
+
             await _contactRepository.UpdateAsync(contactUpdated);
 
             _logger.LogInformation($"Contato {message.Id} atualizado com sucesso!");
