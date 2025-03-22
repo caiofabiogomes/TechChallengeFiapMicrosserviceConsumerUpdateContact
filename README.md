@@ -2,7 +2,7 @@
 
 Este microsserviço .NET consome mensagens para atualização de contatos usando MassTransit e RabbitMQ. Ao receber uma mensagem do tipo `UpdateContactMessage`, ele busca o contato no banco de dados e aplica as atualizações.
 
-Este projeto foi desenvolvido como parte de um trabalho da pós-graduação[repositório(https://github.com/caiofabiogomes/TechChallenge-FIAP-Microsservices)].
+Este projeto foi desenvolvido como parte de um trabalho da pós-graduação[repositório](https://github.com/caiofabiogomes/TechChallenge-FIAP-Microsservices).
 
 ## Tecnologias Utilizadas
 - .NET 8
