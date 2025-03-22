@@ -38,9 +38,13 @@ jobs:
           dotnet nuget add source "https://nuget.pkg.github.com/caiofabiogomes/index.json" \
             --name github \
             --username caiofabiogomes \
-            --password senha \
+            --password ${{ secrets.SECRET_NUGET_PACKAGES }} \
             --store-password-in-clear-text
 
+      - name: Restore and Build
+        run: |
+          dotnet restore ${{ env.Solution_Name }}
+          dotnet build ${{ env.Solution_Name }} --configuration ${{ matrix.configuration }} --no-restore
 
       - name: Execute  tests
         run: dotnet test ${{ env.ProjectTest_Name }} --configuration ${{ matrix.configuration }}
@@ -52,10 +56,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+
       - name: Build and Push Docker Image (Only Release)
         if: matrix.configuration == 'Release'
         run: |
-          docker build --build-arg ARG_SECRET_NUGET_PACKAGES=senha -t ${{ env.IMAGE_NAME }}:${{ github.sha }} .
+          docker build --build-arg ARG_SECRET_NUGET_PACKAGES=${{ secrets.SECRET_NUGET_PACKAGES }} -t ${{ env.IMAGE_NAME }}:${{ github.sha }} .
           docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.IMAGE_NAME }}:latest
           docker push ${{ env.IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.IMAGE_NAME }}:latest
+
